@@ -8,9 +8,9 @@ project(main)
 set(ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Set the output folder where your program will be created
-#set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${ROOT_PATH}/dist)
-#set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ROOT_PATH}/dist)
-#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ROOT_PATH}/dist)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${ROOT_PATH}/build/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ROOT_PATH}/build/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ROOT_PATH}/build/bin)
 
 # Set default compilation flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -rdynamic -std=c++11")

@@ -28,11 +28,13 @@ while getopts "h?e:sc" opt; do
 		exit 0
 		;;
 	s)
+		rm -rfd "$CMAKE_DIR"
 		mkdir -p "$CMAKE_DIR" && cd "$CMAKE_DIR" && cmake -G "$CMAKE_GENERATOR" ..
 		exit 0
 		;;
 	c)
 		rm -rfd "$CMAKE_DIR"
+		exit 0
 		;;
 	e)
 		while ${OPTARG}; do :; done
