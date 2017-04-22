@@ -1,12 +1,9 @@
 #include <iostream>
 #include <thread>
 
-#include "IrStd/Compiler.hpp"
-#include "IrStd/Bootstrap.hpp"
-#include "IrStd/Logger.hpp"
-#include "IrStd/Compiler.hpp"
-#include "IrStd/Exception.hpp"
-#include "IrStd/Topic.hpp"
+#include "IrStd/IrStd.hpp"
+#include <curl/curl.h>
+#include <future>
 
 constexpr int numThreads = 10;
 
@@ -18,17 +15,67 @@ void call_from_thread(int tid)
 	IRSTD_LOG_INFO("Launched by thread " << tid);
 }
 
-int main()
+static size_t fetchCurlCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {
-//	std::thread t[numThreads];
+	((std::string*)userp)->append((char*)contents, size * nmemb);
+	return size * nmemb;
+}
 
-	IrStd::Logger::getDefault().addTopic(IrStd::Topic::IrStdMemory);
-	IrStd::Logger::getDefault().addTopic(IrStd::Topic::None);
+bool fetch(std::string& data, const char* const url)
+{
+	CURL *curl;
+	CURLcode res;
+
+	curl = curl_easy_init();
+	if (curl)
+	{
+		::curl_easy_setopt(curl, CURLOPT_URL, url);
+		::curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, fetchCurlCallback);
+		::curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
+		res = ::curl_easy_perform(curl);
+		::curl_easy_cleanup(curl);
+
+		if (res == ::CURLE_OK)
+		{
+			return true;
+		}
+
+		IRSTD_LOG(curl_easy_strerror(res) << " (url=" << url << ")");
+	}
+
+	return true;
+}
+
+void read_page()
+{
+	std::string data;
+	std::future<bool> fut = std::async(fetch, std::ref(data), "htdtp://dsd"); 
+
+	fut.wait();
+
+	IRSTD_LOG(data);
+}
+
+int mainIrStd()
+{
+	IrStd::Logger::getDefault().allTopics();
+
+	std::thread t[numThreads];
+	std::string data;
+
+	IrStd::Fetch fetch(data);
+	auto fut = fetch.url("www.google.com");
+
+	fut.wait();
+
+	IRSTD_LOG(data);
+
+	//fetch.
 
 	IRSTD_LOG_INFO("Using " IRSTD_COMPILER_STRING);
 
 	// Launch a group of threads
-/*	for (int i = 0; i < numThreads; ++i) {
+	for (int i = 0; i < numThreads; ++i) {
 		t[i] = std::thread(call_from_thread, i);
 	}
 
@@ -37,7 +84,13 @@ int main()
 		t[i].join();
 	}
 
-	std::cerr << "end" << std::endl;
-*/
+	read_page();
+
 	return 0;
+}
+
+int main()
+{
+	auto& main = IrStd::Main::getInstance();
+	return main.call(mainIrStd);
 }

@@ -1,8 +1,11 @@
 # Minimal version for CMake
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
 # Project's name
 project(main)
+
+# Set c++11 standard
+set(CMAKE_CXX_STANDARD 11)
 
 # Set the usefull path
 set(ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
@@ -13,7 +16,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${ROOT_PATH}/build/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${ROOT_PATH}/build/bin)
 
 # Set default compilation flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -rdynamic -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -rdynamic")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -pthread")
 
 # Include directory
@@ -24,4 +27,4 @@ add_subdirectory(IrStd)
 
 # Add main executable
 add_executable(main main.cpp)
-target_link_libraries(main irstd)
+target_link_libraries(main irstd curl)
